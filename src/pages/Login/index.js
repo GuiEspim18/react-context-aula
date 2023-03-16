@@ -53,13 +53,14 @@ function Login() {
       <Button
         variant="contained"
         color="primary"
+        disabled={name.length<4}
         onClick={() => history.push('/feira')}
       >
         Avançar
       </Button>
     </Container>
   );
-  
+
 };
 
 export default Login;

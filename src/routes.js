@@ -3,6 +3,8 @@ import Login from "pages/Login";
 import Feira from "pages/Feira";
 import Carrinho from "pages/Carrinho";
 import { UserProider } from "common/contexts/User/User";
+import { ShoppingProvider } from "common/contexts/Shopping/Shopping";
+import { PaymentProvider } from "common/contexts/Payment/Payment";
 
 function Router() {
     return (
@@ -12,13 +14,17 @@ function Router() {
                     <Route exact path="/">
                         <Login />
                     </Route>
-                    <Route path="/feira">
-                        <Feira />
-                    </Route>
+                    <ShoppingProvider>
+                        <Route path="/feira">
+                            <Feira />
+                        </Route>
+                        <PaymentProvider>
+                            <Route path="/carrinho">
+                                <Carrinho />
+                            </Route>
+                        </PaymentProvider>
+                    </ShoppingProvider>
                 </UserProider>
-                <Route path="/carrinho">
-                    <Carrinho />
-                </Route>
             </Switch>
         </BrowserRouter>
     );

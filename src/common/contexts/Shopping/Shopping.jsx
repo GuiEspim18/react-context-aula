@@ -1,14 +1,18 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import { usePayment } from "../Payment/Payment";
+import { UserContext } from "../User/User";
 
 export const ShoppingContext = createContext();
 ShoppingContext.displayName = "Shopping";
 
 export const ShoppingProvider = ({ children }) => {
     const [shopping, setShopping] = useState([]);
-    const [quantity, setQuantity] = useState(0)
+    const [quantity, setQuantity] = useState(0);
+    const [ totalValue, setTotalValue ] = useState(0);
+
 
     return (
-        <ShoppingContext.Provider value={{ shopping, setShopping, quantity, setQuantity }}>
+        <ShoppingContext.Provider value={{ shopping, setShopping, quantity, setQuantity, totalValue, setTotalValue }}>
             {children}
         </ShoppingContext.Provider>
     );
@@ -18,7 +22,9 @@ export const ShoppingProvider = ({ children }) => {
 
 export const useShopping = () => {
     // usando o contexto e pegando os states do provider
-    const { shopping, setShopping, quantity, setQuantity } = useContext(ShoppingContext)
+    const { shopping, setShopping, quantity, setQuantity, totalValue, setTotalValue } = useContext(ShoppingContext)
+    const { paymentForm } = usePayment()
+    const { setBalance } = useContext(UserContext)
 
     // função utilitaria de adicionar quantidade
     function changeQuantity(id, quantity) {
@@ -54,11 +60,23 @@ export const useShopping = () => {
         setShopping(changeQuantity(id, -1))
     }
 
+    function buy () {
+        setShopping([])
+        setBalance((current) => current - totalValue)
+    }
+
     useEffect(() => {
-        const newQuantity = shopping.reduce((counter, product) => counter + product.quantity, 0)
+        const { newTotal, newQuantity } = shopping.reduce((counter, product) => ({
+            newQuantity: counter.newQuantity + product.quantity,
+            newTotal: counter.newTotal + (product.valor * product.quantity)
+        }), {
+            newQuantity: 0,
+            newTotal: 0
+        })
         setQuantity(newQuantity)
-    }, [shopping, setQuantity])
+        setTotalValue(newTotal * paymentForm.fees)
+    }, [shopping, setQuantity, setTotalValue, paymentForm])
 
     // retrornando os states do provider e as nossas funções de remover e adicionar
-    return { shopping, setShopping, addProduct, removeProduct, quantity }
+    return { shopping, setShopping, addProduct, removeProduct, quantity, totalValue, buy }
 }

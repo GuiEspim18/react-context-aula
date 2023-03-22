@@ -15,10 +15,10 @@ function Router() {
                         <Login />
                     </Route>
                     <ShoppingProvider>
-                        <Route path="/feira">
-                            <Feira />
-                        </Route>
                         <PaymentProvider>
+                            <Route path="/feira">
+                                <Feira />
+                            </Route>
                             <Route path="/carrinho">
                                 <Carrinho />
                             </Route>
